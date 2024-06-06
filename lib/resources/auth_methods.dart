@@ -1,5 +1,6 @@
-// ignore_for_file: empty_catches, prefer_final_fields, avoid_print, unnecessary_brace_in_string_interps
+// ignore_for_file: empty_catches, prefer_final_fields, avoid_print, unnecessary_brace_in_string_interps, unused_catch_stack, unnecessary_null_comparison, unnecessary_string_interpolations, unnecessary_nullable_for_final_variable_declarations, control_flow_in_finally, avoid_web_libraries_in_flutter, unused_import
 
+import "dart:html";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
@@ -9,11 +10,13 @@ class AuthMethods with ChangeNotifier {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
+  Stream<User?> get authChanges => _auth.authStateChanges();
+  User get user => _auth.currentUser!;
+
   Future<bool> signInWIthGoogle(BuildContext context) async {
     bool res = false;
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      print("google user Data is $googleUser");
 
       final GoogleSignInAuthentication? googleAuth =
           await googleUser?.authentication;
@@ -22,16 +25,11 @@ class AuthMethods with ChangeNotifier {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      print("auth credential is $credential");
 
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
-      print("user credential is $userCredential");
-
       User? user = userCredential.user;
-      print("user credential is $userCredential");
-      print(userCredential.additionalUserInfo!.isNewUser);
 
       if (user != null) {
         if (userCredential.additionalUserInfo!.isNewUser) {
@@ -41,15 +39,78 @@ class AuthMethods with ChangeNotifier {
             "profilePhoto": user.photoURL,
           });
         }
-        print("successfully logged in through th goog account sign in method");
         res = true;
       }
-    } catch (err, stackTrace){
-      print(
-          "catch error occured while login through the google account and the error is ${err}");
-      print("stackTrace is $stackTrace");
+    } catch (err, stackTrace) {
       res = false;
     }
     return res;
   }
+
+//   //  CRUD Methods
+
+// //  1) Add
+
+//   Future<String> addData(String email, String password) async{
+//     String res = "error";
+//     try {
+//       if (email.isNotEmpty && password.isNotEmpty) {
+//         await _fireStore.collection("users").doc("uid").set({
+//           "email": email,
+//           "password": password,
+//         });
+//         res = "success";
+//       } else {
+//         res = "error";
+//       }
+//     } catch (err) {
+//       res = "error";
+//     } finally {
+//       return res;
+//     }
+//   }
+
+//   // 2) Update
+
+//   Future<String> updateData(String email, String password) async {
+//     String res = "error";
+//     try {
+//       if (email.isNotEmpty && password.isNotEmpty) {
+//         await _fireStore
+//             .collection("users")
+//             .doc("uid")
+//             .update({"email": email});
+
+//         res = "success";
+//       } else {
+//         res = "error";
+//       }
+//     } catch (err) {
+//       res = "error";
+//     } finally {
+//       return res;
+//     }
+//   }
+
+//   // 3) READ
+
+//   Future<User> getData() async {
+//     DocumentSnapshot snapshot =
+//         await _fireStore.collection("users").doc(_auth.currentUser!.uid).get();
+//     return snapshot.data() as User;
+//   }
+
+//   // 4) DELETE
+
+//   Future<String> deleteData() async {
+//     String res = "error";
+//     try {
+//       await _fireStore.collection("users").doc(_auth.currentUser!.uid).delete();
+//       res = "success";
+//     } catch (err) {
+//       res = "error";
+//     } finally {
+//       return res;
+//     }
+//   }
 }
