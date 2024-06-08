@@ -1,6 +1,5 @@
 // ignore_for_file: empty_catches, prefer_final_fields, avoid_print, unnecessary_brace_in_string_interps, unused_catch_stack, unnecessary_null_comparison, unnecessary_string_interpolations, unnecessary_nullable_for_final_variable_declarations, control_flow_in_finally, avoid_web_libraries_in_flutter, unused_import
 
-import "dart:html";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
@@ -37,11 +36,12 @@ class AuthMethods with ChangeNotifier {
             "username": user.displayName,
             "uid": user.uid,
             "profilePhoto": user.photoURL,
-          });
+          },
+      );
         }
         res = true;
       }
-    } catch (err, stackTrace) {
+    } catch (err, stackTrace){
       res = false;
     }
     return res;
